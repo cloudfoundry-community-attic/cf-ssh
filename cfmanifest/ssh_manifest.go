@@ -10,12 +10,13 @@ func NewSSHManifest(appName string) (manifest *Manifest) {
 }
 
 // NewSSHManifestFromManifestPath prepares for a new cf-ssh.yml based on existing manifest.yml
-func NewSSHManifestFromManifestPath(appName string, manifestPath string) (manifest *Manifest, err error) {
+func NewSSHManifestFromManifestPath(manifestPath string) (manifest *Manifest, err error) {
 	manifest, err = NewManifestFromPath(manifestPath)
 	if err != nil {
 		return
 	}
 	cfssh := manifest.Apps[0]
+	cfssh.Name += "-ssh"
 	cfssh.Command = "curl http://tmate-bootstrap.cfapps.io | sh"
 	cfssh.NoRoute = true
 

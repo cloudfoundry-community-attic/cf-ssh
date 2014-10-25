@@ -17,10 +17,12 @@ type Manifest struct {
 type ManifestApp struct {
 	Name      string            `yaml:"name"`
 	Buildpack string            `yaml:"buildpack"`
+	StackName string            `yaml:"stack"`
 	Command   string            `yaml:"command"`
 	Domain    string            `yaml:"domain"`
 	Instances int               `yaml:"instances"`
 	Memory    string            `yaml:"memory"`
+	DiskQuota string            `yaml:"disk_quota"`
 	Host      string            `yaml:"host"`
 	Path      string            `yaml:"path"`
 	Timeout   int               `yaml:"timeout"`

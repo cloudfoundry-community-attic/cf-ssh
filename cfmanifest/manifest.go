@@ -1,5 +1,12 @@
 package cfmanifest
 
+import (
+	"io/ioutil"
+	"os"
+
+	"launchpad.net/goyaml"
+)
+
 // Manifest models a manifest.yml
 // See http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html
 type Manifest struct {
@@ -25,6 +32,21 @@ type ManifestApp struct {
 // NewManifest creates a Manifest
 func NewManifest() (manifest *Manifest) {
 	return &Manifest{}
+}
+
+// NewManifestFromPath creates a Manifest from a manifest.yml file
+func NewManifestFromPath(manifestPath string) (manifest *Manifest, err error) {
+	manifest = &Manifest{}
+	file, err := os.Open(manifestPath)
+	if err != nil {
+		return
+	}
+	yml, err := ioutil.ReadAll(file)
+	if err != nil {
+		return
+	}
+	err = goyaml.Unmarshal(yml, manifest)
+	return
 }
 
 // AddApplication adds a default manifestApp

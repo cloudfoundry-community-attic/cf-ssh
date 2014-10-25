@@ -1,0 +1,10 @@
+applications:
+- name: oneapp
+  buildpack: ruby-buildpack
+  path: ./myapp-webapp
+  memory: 256M
+  services:
+  - mypostgres
+  - myredis
+  env:
+    DEBUG: true

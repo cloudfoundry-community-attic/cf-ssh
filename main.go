@@ -18,13 +18,14 @@ func cmdSSH(c *cli.Context) {
 	}
 	var manifest *cfmanifest.Manifest
 	if _, err := os.Stat(manifestPath); os.IsNotExist(err) {
-		appName := c.Args().First()
-		if appName == "" {
-			fmt.Println("USAGE: cf-ssh [APPNAME] [-f manifest.yml]")
-			return
-		}
+		log.Fatal("USAGE: cf-ssh -f manifest.yml")
 
-		manifest = cfmanifest.NewSSHManifest(appName)
+		// appName := c.Args().First()
+		//
+		// if appName == "" {
+		// 	log.Fatal("USAGE: cf-ssh [APPNAME] [-f manifest.yml]")
+		// }
+		// manifest = cfmanifest.NewSSHManifest(appName)
 	} else {
 		manifest, err = cfmanifest.NewSSHManifestFromManifestPath(manifestPath)
 		if err != nil {

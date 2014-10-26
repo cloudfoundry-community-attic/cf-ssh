@@ -1,17 +1,20 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
+	"time"
 
 	"github.com/cloudfoundry-community/cf-ssh/cfmanifest"
 	"github.com/codegangsta/cli"
 )
 
 func cmdSSH(c *cli.Context) {
-	fmt.Println(c.String("manifest"))
 	manifestPath, err := filepath.Abs(c.String("manifest"))
 	if err != nil {
 		log.Fatal(err)
@@ -39,6 +42,51 @@ func cmdSSH(c *cli.Context) {
 	}
 
 	manifest.Save(cfSSHYAML)
+	sshAppname := manifest.ApplicationName()
+	fmt.Printf("Deploying SSH container '%s'...\n", sshAppname)
+
+	cmd := exec.Command("cf", "push", "-f", cfSSHYAML)
+	err = cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to run SSH container: %s", err)
+	}
+
+	var sshHost string
+	fmt.Print("Initiating tmate connection...")
+	for counter := 0; counter < 20; counter++ {
+		time.Sleep(1 * time.Second)
+
+		// repeat following until it succeeds or times out
+		// ssh_host=$(cf logs $ssh_appname --recent | grep tmate.io | tail -n1 | awk '{print $NF }')
+		cmd = exec.Command("cf", "logs", sshAppname, "--recent")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+
+		err = cmd.Run()
+		if err != nil {
+			log.Fatalf("Failed to get recent logs: %s", err)
+		}
+		logs := out.String()
+		sshHostLine, err := regexp.CompilePOSIX("=====> (.*)$")
+		if err != nil {
+			log.Fatalf("Invalid POSIX regular expression: %s", err)
+		}
+		sshHostMatch := sshHostLine.FindStringSubmatch(logs)
+		if sshHostLine != nil {
+			sshHost = sshHostMatch[1]
+			break
+		} else {
+			fmt.Print(".")
+		}
+	}
+	fmt.Println(sshHost)
+
+	// ssh $ssh_host
+
+	// Either:
+	// cf delete $ssh_appname -f
+	// cf stop $ssh_appname
+
 }
 
 func main() {

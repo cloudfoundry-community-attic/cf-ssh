@@ -45,6 +45,12 @@ func (manifest Manifest) FirstApplication() map[interface{}]interface{} {
 	return app.(map[interface{}]interface{})
 }
 
+// ApplicationName returns the "name" of the first application in the manifest
+func (manifest Manifest) ApplicationName() string {
+	app := manifest.FirstApplication()
+	return app["name"].(string)
+}
+
 // AddApplication adds a default manifestApp
 func (manifest Manifest) AddApplication(appName string) (app map[interface{}]interface{}) {
 	app = map[interface{}]interface{}{"name": appName}

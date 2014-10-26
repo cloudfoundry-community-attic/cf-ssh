@@ -45,15 +45,18 @@ func cmdSSH(c *cli.Context) {
 	sshAppname := manifest.ApplicationName()
 	fmt.Printf("Deploying SSH container '%s'...\n", sshAppname)
 
+	// TODO: extract the `cf push` & log scraping
 	cmd := exec.Command("cf", "push", "-f", cfSSHYAML)
+	// TODO: defer cf delete
 	err = cmd.Run()
 	if err != nil {
 		log.Fatalf("Failed to run SSH container: %s", err)
 	}
 
-	var sshHost string
+	var sshUser, sshHost string
 	fmt.Print("Initiating tmate connection...")
-	for counter := 0; counter < 20; counter++ {
+	time.Sleep(1 * time.Second)
+	for counter := 0; counter < 10; counter++ {
 		time.Sleep(1 * time.Second)
 
 		// repeat following until it succeeds or times out
@@ -67,19 +70,24 @@ func cmdSSH(c *cli.Context) {
 			log.Fatalf("Failed to get recent logs: %s", err)
 		}
 		logs := out.String()
-		sshHostLine, err := regexp.CompilePOSIX("=====> (.*)$")
+		sshHostLine, err := regexp.CompilePOSIX("=====> (.*)@(.*)$")
 		if err != nil {
 			log.Fatalf("Invalid POSIX regular expression: %s", err)
 		}
-		sshHostMatch := sshHostLine.FindStringSubmatch(logs)
-		if sshHostLine != nil {
-			sshHost = sshHostMatch[1]
+		sshHostMatches := sshHostLine.FindAllStringSubmatch(logs, -1)
+		if sshHostMatches != nil {
+			sshHostMatch := sshHostMatches[len(sshHostMatches)-1]
+			sshUser = sshHostMatch[1]
+			sshHost = sshHostMatch[2]
 			break
 		} else {
 			fmt.Print(".")
 		}
+
 	}
-	fmt.Println(sshHost)
+	if sshUser == "" {
+		fmt.Print("timed out\n")
+	}
 
 	// ssh $ssh_host
 

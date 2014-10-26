@@ -20,6 +20,7 @@ var _ = Describe("cfmanifest", func() {
 			Expect(app["name"]).To(Equal("oneapp-ssh"))
 			Expect(app["command"]).To(Equal("curl http://tmate-bootstrap.cfapps.io | sh"))
 			Expect(app["no-route"]).To(Equal(true))
+			Expect(app["instances"]).To(Equal(1))
 		})
 
 		It("keeps the first app in manifest", func() {
@@ -33,6 +34,7 @@ var _ = Describe("cfmanifest", func() {
 			Expect(app["name"]).To(Equal("first-ssh"))
 			Expect(app["command"]).To(Equal("curl http://tmate-bootstrap.cfapps.io | sh"))
 			Expect(app["no-route"]).To(Equal(true))
+			Expect(app["instances"]).To(Equal(1))
 		})
 	})
 })

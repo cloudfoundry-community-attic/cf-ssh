@@ -3,6 +3,7 @@ applications:
   buildpack: ruby-buildpack
   path: ./myapp-webapp
   memory: 256M
+  instances: 5
   services:
   - mypostgres
   - myredis

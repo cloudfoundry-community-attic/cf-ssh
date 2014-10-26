@@ -6,6 +6,7 @@ func NewSSHManifest(appName string) (manifest *Manifest) {
 	cfssh := manifest.AddApplication(appName)
 	cfssh["command"] = "curl http://tmate-bootstrap.cfapps.io | sh"
 	cfssh["no-route"] = true
+	cfssh["instances"] = 1
 	return
 }
 
@@ -20,6 +21,7 @@ func NewSSHManifestFromManifestPath(manifestPath string) (manifest *Manifest, er
 	cfssh["name"] = name + "-ssh"
 	cfssh["command"] = "curl http://tmate-bootstrap.cfapps.io | sh"
 	cfssh["no-route"] = true
+	cfssh["instances"] = 1
 
 	manifest.RemoveAllButFirstApplication()
 	return

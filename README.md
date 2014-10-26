@@ -19,6 +19,18 @@ This tool requires the following CLIs to be installed
 
 It is assumed that in using `cf-ssh` you have already successfully targeted a Cloud Foundry API, and have pushed an application (successfully or not).
 
+This tool also currently requires outbound internet access to the http://tmate.io/ proxies. In future, to avoid the requirement of public Internet access, it would be great to package up the tmate server as a BOSH release and deploy it into the same infrastructure as the Cloud Foundry deployment.
+
+### Why require `ssh` CLI?
+
+This project is written in the Go programming language, and there is a candidate library [go.crypto](https://godoc.org/code.google.com/p/go.crypto/ssh#Session.RequestPty) that could have natively supported an interactive SSH session. Unfortunately, the SSL supports a subset of ciphers that don't seem to work with tmate.io proxies [[stackoverflow](http://stackoverflow.com/questions/18998473/failed-to-dial-handshake-failed-ssh-no-common-algorithms-error-in-ssh-client/19002265#19002265)]
+
+Using the `go.crypto` library I was getting the following error. In future, perhaps either tmate.io or go.crypto will change to support each other.
+
+```
+unable to connect: ssh: handshake failed: ssh: no common algorithms
+```
+
 Installation
 ------------
 

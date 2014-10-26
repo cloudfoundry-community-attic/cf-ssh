@@ -89,7 +89,12 @@ func cmdSSH(c *cli.Context) {
 		fmt.Print("timed out\n")
 	}
 
-	// ssh $ssh_host
+	fmt.Print("success\n")
+	cmd = exec.Command("ssh", "-t", "-t", fmt.Sprintf("%s@%s", sshUser, sshHost))
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 
 	// Either:
 	// cf delete $ssh_appname -f

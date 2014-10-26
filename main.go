@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudfoundry-community/cf-ssh/cfmanifest"
 	"github.com/codegangsta/cli"
-	"github.com/kr/pretty"
 )
 
 func cmdSSH(c *cli.Context) {
@@ -32,7 +31,13 @@ func cmdSSH(c *cli.Context) {
 			log.Fatalf("Manifest %s exists but failed to load: %s", manifestPath, err)
 		}
 	}
-	fmt.Printf("%# v\n", pretty.Formatter(*manifest))
+
+	cfSSHYAML, err := filepath.Abs("cf-ssh.yml")
+	if err != nil {
+		log.Fatalf("Could not create absolute file path: %s", err)
+	}
+
+	manifest.Save(cfSSHYAML)
 }
 
 func main() {

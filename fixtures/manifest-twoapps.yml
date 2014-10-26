@@ -1,0 +1,19 @@
+applications:
+- name: first
+  buildpack: ruby-buildpack
+  path: ./first-webapp
+  memory: 256M
+  services:
+  - mypostgres
+  - myredis
+  env:
+    DEBUG: true
+- name: second
+  buildpack: go-buildpack
+  path: ./second-webapp
+  memory: 256M
+  services:
+  - mypostgres
+  - myredis
+  env:
+    DEBUG: true

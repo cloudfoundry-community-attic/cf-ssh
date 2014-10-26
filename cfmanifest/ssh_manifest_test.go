@@ -9,17 +9,30 @@ import (
 
 var _ = Describe("cfmanifest", func() {
 	Describe("NewSSHManifestFromManifestPath", func() {
-		It("loads manifest", func() {
+		It("keeps the one app in manifest", func() {
 			path, err := fixtures.FixturePath("manifest-oneapp.yml")
 			Expect(err).NotTo(HaveOccurred())
 
 			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(manifest.Apps)).To(Equal(1))
-			app := manifest.Apps[0]
-			Expect(app.Name).To(Equal("oneapp-ssh"))
-			Expect(app.Command).To(Equal("curl http://tmate-bootstrap.cfapps.io | sh"))
-			Expect(app.NoRoute).To(Equal(true))
+			Expect(len(manifest.Applications())).To(Equal(1))
+			app := manifest.FirstApplication()
+			Expect(app["name"]).To(Equal("oneapp-ssh"))
+			Expect(app["command"]).To(Equal("curl http://tmate-bootstrap.cfapps.io | sh"))
+			Expect(app["no-route"]).To(Equal(true))
+		})
+
+		It("keeps the first app in manifest", func() {
+			path, err := fixtures.FixturePath("manifest-twoapps.yml")
+			Expect(err).NotTo(HaveOccurred())
+
+			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(len(manifest.Applications())).To(Equal(1))
+			app := manifest.FirstApplication()
+			Expect(app["name"]).To(Equal("first-ssh"))
+			Expect(app["command"]).To(Equal("curl http://tmate-bootstrap.cfapps.io | sh"))
+			Expect(app["no-route"]).To(Equal(true))
 		})
 	})
 })

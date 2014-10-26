@@ -14,19 +14,20 @@ var _ = Describe("cfmanifest", func() {
 			Expect(err).NotTo(HaveOccurred())
 			manifest, err := cfmanifest.NewManifestFromPath(path)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(len(manifest.Apps)).To(Equal(1))
-			app := manifest.Apps[0]
-			Expect(app.Name).To(Equal("oneapp"))
+			Expect(len(manifest.Applications())).To(Equal(1))
+			app := manifest.FirstApplication()
+			Expect(app["name"]).To(Equal("oneapp"))
 		})
 	})
 
 	Describe("AddApplication", func() {
 		It("adds first app", func() {
 			manifest := cfmanifest.NewManifest()
-			Expect(len(manifest.Apps)).To(Equal(0))
-			app := manifest.AddApplication("first")
-			Expect(len(manifest.Apps)).To(Equal(1))
-			Expect(app.Name).To(Equal("first"))
+			Expect(len(manifest.Applications())).To(Equal(0))
+			manifest.AddApplication("first")
+			Expect(len(manifest.Applications())).To(Equal(1))
+			first := manifest.FirstApplication()
+			Expect(first["name"]).To(Equal("first"))
 		})
 
 	})

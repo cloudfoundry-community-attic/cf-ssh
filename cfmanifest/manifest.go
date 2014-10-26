@@ -9,27 +9,7 @@ import (
 
 // Manifest models a manifest.yml
 // See http://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html
-type Manifest struct {
-	Apps []*ManifestApp `yaml:"applications"`
-}
-
-// ManifestApp describes an individual app as part of the manifest
-type ManifestApp struct {
-	Name      string            `yaml:"name"`
-	Buildpack string            `yaml:"buildpack"`
-	StackName string            `yaml:"stack"`
-	Command   string            `yaml:"command"`
-	Domain    string            `yaml:"domain"`
-	Instances int               `yaml:"instances"`
-	Memory    string            `yaml:"memory"`
-	DiskQuota string            `yaml:"disk_quota"`
-	Host      string            `yaml:"host"`
-	Path      string            `yaml:"path"`
-	Timeout   int               `yaml:"timeout"`
-	NoRoute   bool              `yaml:"no-route"`
-	EnvVars   map[string]string `yaml:"env"`
-	Services  []string          `yaml:"services"`
-}
+type Manifest map[string]interface{}
 
 // NewManifest creates a Manifest
 func NewManifest() (manifest *Manifest) {
@@ -51,14 +31,43 @@ func NewManifestFromPath(manifestPath string) (manifest *Manifest, err error) {
 	return
 }
 
-// AddApplication adds a default manifestApp
-func (manifest *Manifest) AddApplication(appName string) (app *ManifestApp) {
-	app = &ManifestApp{
-		Name:    appName,
-		Memory:  "1024M",
-		Host:    appName,
-		Timeout: 60,
+// Applications returns the full list of applications
+func (manifest Manifest) Applications() (apps []interface{}) {
+	if manifest["applications"] == nil {
+		return []interface{}{}
 	}
-	manifest.Apps = append(manifest.Apps, app)
+	return manifest["applications"].([]interface{})
+}
+
+// FirstApplication returns the first application in the manifest
+func (manifest Manifest) FirstApplication() map[interface{}]interface{} {
+	app := manifest.Applications()[0]
+	return app.(map[interface{}]interface{})
+}
+
+// AddApplication adds a default manifestApp
+func (manifest Manifest) AddApplication(appName string) (app map[interface{}]interface{}) {
+	app = map[interface{}]interface{}{"name": appName}
+	apps := manifest.Applications()
+	apps = append(apps, app)
+	manifest["applications"] = apps
+	return
+}
+
+// RemoveAllButFirstApplication removes all applications but the first
+func (manifest Manifest) RemoveAllButFirstApplication() {
+	firstApp := manifest.Applications()[0]
+	apps := []interface{}{firstApp}
+	manifest["applications"] = apps
+	return
+}
+
+// Save the Manifest to a file in YAML format
+func (manifest Manifest) Save(path string) (err error) {
+	data, err := goyaml.Marshal(manifest)
+	if err != nil {
+		return
+	}
+	ioutil.WriteFile(path, data, 0644)
 	return
 }

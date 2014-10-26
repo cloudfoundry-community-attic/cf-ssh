@@ -22,6 +22,10 @@ It is assumed that in using `cf-ssh` you have already successfully targeted a Cl
 Installation
 ------------
 
+Download a [pre-compiled release](https://github.com/cloudfoundry-community/cf-ssh/releases) for your platform. Place it in your `$PATH` or `%PATH%` and rename to `cf-ssh` (or `cf-ssh.exe` for Windows).
+
+Alternately, if you have Go setup you can build it from source:
+
 ```
 go get -u github.com/cloudfoundry-community/cf-ssh
 ```

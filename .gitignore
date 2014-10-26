@@ -37,3 +37,4 @@ apps
 gin-bin
 
 cf-ssh.yml
+out

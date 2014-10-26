@@ -5,6 +5,8 @@ SSH into a running container for your Cloud Foundry application, run one-off tas
 
 Initial implementation requires the application to have a `manifest.yml`.
 
+Also, `cf-ssh` requires that you run the command from within the project source folder. It performs a `cf push` to create a new application based on the same source code/path, buildpack, and variables. Once CF Runtime supports copy app bits [#78847148](https://www.pivotaltracker.com/story/show/78847148), then `cf-ssh` will be upgraded to use app bit copying, and not require local access to project app bits.
+
 It is desired that `cf-ssh` works correctly from all platforms that support the `cf` CLI.
 
 Windows is a target platform but has not yet been tested. Please give feedback in the [Issues](https://github.com/cloudfoundry-community/cf-ssh/issues).

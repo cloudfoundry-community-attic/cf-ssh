@@ -16,8 +16,8 @@ Requirements
 
 This tool requires the following CLIs to be installed
 
--	`cf`
--	`ssh`
+-	`cf` ([download](https://github.com/cloudfoundry/cli/releases))
+-	`ssh` (pre-installed on all *nix; [download](http://www.mls-software.com/opensshd.html) for Windows)
 
 It is assumed that in using `cf-ssh` you have already successfully targeted a Cloud Foundry API, and have pushed an application (successfully or not).
 

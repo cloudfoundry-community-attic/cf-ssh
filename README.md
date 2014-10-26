@@ -3,9 +3,7 @@ cf-ssh
 
 SSH into a running container for your Cloud Foundry application, run one-off tasks, debug your app, and more.
 
-Initial implementation requires:
-
--	run `cf-ssh -f path/to/manifest.yml` to obtain information about the application
+Initial implementation requires the application to have a `manifest.yml`.
 
 Installation
 ------------

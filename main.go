@@ -15,6 +15,8 @@ import (
 )
 
 func cmdSSH(c *cli.Context) {
+	// TODO: confirm that `cf` and `ssh` are in path
+	// TODO: Windows: cf.exe and ssh.exe?
 	manifestPath, err := filepath.Abs(c.String("manifest"))
 	if err != nil {
 		log.Fatal(err)

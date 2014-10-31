@@ -41,7 +41,7 @@ Download a [pre-compiled release](https://github.com/cloudfoundry-community/cf-s
 Alternately, if you have Go setup you can build it from source:
 
 ```
-go get -u github.com/cloudfoundry-community/cf-ssh
+go get github.com/cloudfoundry-community/cf-ssh
 ```
 
 Usage

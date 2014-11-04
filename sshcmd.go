@@ -104,7 +104,7 @@ func cmdSSH(c *cli.Context) {
 
 }
 
-func main() {
+func RunSsh(args []string) {
 	app := cli.NewApp()
 	app.Name = "cf-ssh"
 	app.Flags = []cli.Flag{
@@ -118,5 +118,5 @@ func main() {
 	app.Usage = "SSH into a Cloud Foundry app container"
 	app.Action = cmdSSH
 
-	app.Run(os.Args)
+	app.Run(args)
 }

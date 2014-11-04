@@ -1,6 +1,10 @@
 package main
 
-import "github.com/cloudfoundry/cli/plugin"
+import (
+	"fmt"
+
+	"github.com/cloudfoundry/cli/plugin"
+)
 
 /*
 *	This is the struct implementing the interface defined by the core CLI. It can
@@ -61,6 +65,12 @@ func (c *SshPlugin) GetMetadata() plugin.PluginMetadata {
 * plugin.
  */
 func main() {
+
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Not running as plugin, please install as plugin to CF")
+		}
+	}()
 	// Any initialization for your plugin can be handled here
 	//
 	// Note: to run the plugin.Start method, we pass in a pointer to the struct

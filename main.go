@@ -49,6 +49,10 @@ func cmdSSH(c *cli.Context) {
 
 	// TODO: extract the `cf push` & log scraping
 	cmd := exec.Command("cf", "push", "-f", cfSSHYAML)
+	if c.Bool("verbose") {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
 	// TODO: defer cf delete
 	err = cmd.Run()
 	if err != nil {
@@ -112,6 +116,10 @@ func main() {
 			Name:  "manifest, f",
 			Value: "manifest.yml",
 			Usage: "Path to application manifest",
+		},
+		cli.BoolFlag{
+			Name:  "verbose",
+			Usage: "Verbose output",
 		},
 	}
 

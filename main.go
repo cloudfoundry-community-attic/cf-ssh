@@ -2,12 +2,15 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry-community/cf-ssh/cfmanifest"
@@ -17,6 +20,11 @@ import (
 func cmdSSH(c *cli.Context) {
 	// TODO: confirm that `cf` and `ssh` are in path
 	// TODO: Windows: cf.exe and ssh.exe?
+	bootstrapperUrl, err := FindValidBootstrapper("tmate-bootstrap.cfapps.io")
+	println("Using " + bootstrapperUrl + " as the tmate-bootstrap server.")
+	if err != nil {
+		log.Fatal(err)
+	}
 	manifestPath, err := filepath.Abs(c.String("manifest"))
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +40,7 @@ func cmdSSH(c *cli.Context) {
 		// }
 		// manifest = cfmanifest.NewSSHManifest(appName)
 	} else {
-		manifest, err = cfmanifest.NewSSHManifestFromManifestPath(manifestPath)
+		manifest, err = cfmanifest.NewSSHManifestFromManifestPath(manifestPath, bootstrapperUrl)
 		if err != nil {
 			log.Fatalf("Manifest %s exists but failed to load: %s", manifestPath, err)
 		}
@@ -92,6 +100,7 @@ func cmdSSH(c *cli.Context) {
 	}
 
 	fmt.Print("success\n")
+	println("ssh command:  ssh -t -t " + fmt.Sprintf("%s@%s", sshUser, sshHost))
 	cmd = exec.Command("ssh", "-t", "-t", fmt.Sprintf("%s@%s", sshUser, sshHost))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -119,4 +128,41 @@ func main() {
 	app.Action = cmdSSH
 
 	app.Run(os.Args)
+}
+
+// This function first parses the domains in Cloud Foundry and
+// looks for locally running versions of the tmate-bootstrap
+// server.  If it is not found locally, the public version is
+// attempted.  If that fails, we let the user know.
+func FindValidBootstrapper(defaultUrl string) (string, error) {
+	pathToBootstrap := defaultUrl
+	cmdGetDomain := exec.Command("cf", "domains")
+	domainsOutput, err := cmdGetDomain.Output()
+	if err != nil {
+		println(err.Error())
+		return "", err
+	}
+	domainsLineList := strings.Split(string(domainsOutput), "\n")
+	for _, domainsLine := range domainsLineList {
+		path := "tmate-bootstrap." + strings.Split(domainsLine, " ")[0]
+
+		resp, err := http.Get("https://" + path)
+		if err != nil || resp.StatusCode == 200 {
+			resp, err = http.Get("http://" + path)
+			if err == nil && resp.StatusCode == 200 {
+				pathToBootstrap = "http://" + path
+				break
+			}
+		} else {
+			pathToBootstrap = "https://" + path
+			break
+		}
+	}
+	if pathToBootstrap == defaultUrl {
+		resp, err := http.Get(defaultUrl)
+		if err == nil && resp.StatusCode == 200 {
+			return "", errors.New("Could not find a valid tmate-bootstrap server.")
+		}
+	}
+	return pathToBootstrap, nil
 }

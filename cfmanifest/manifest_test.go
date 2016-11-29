@@ -9,14 +9,26 @@ import (
 
 var _ = Describe("cfmanifest", func() {
 	Describe("NewManifestFromPath", func() {
-		It("loads manifest", func() {
-			path, err := fixtures.FixturePath("manifest-oneapp.yml")
+		testWithFixture := func(path string) {
+			path, err := fixtures.FixturePath(path)
 			Expect(err).NotTo(HaveOccurred())
 			manifest, err := cfmanifest.NewManifestFromPath(path)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(len(manifest.Applications())).To(Equal(1))
 			app := manifest.FirstApplication()
 			Expect(app["name"]).To(Equal("oneapp"))
+		}
+
+		Context("with 'applications' root key", func() {
+			It("loads manifest", func() {
+				testWithFixture("manifest-oneapp.yml")
+			})
+		})
+
+		Context("without 'applications' root key", func() {
+			It("loads manifest", func() {
+				testWithFixture("manifest-oneapp-without-root-node.yml")
+			})
 		})
 	})
 

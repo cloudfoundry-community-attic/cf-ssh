@@ -18,7 +18,9 @@ func NewManifest() (manifest *Manifest) {
 
 // NewManifestFromPath creates a Manifest from a manifest.yml file
 func NewManifestFromPath(manifestPath string) (manifest *Manifest, err error) {
+	manifestData := make(map[string]interface{})
 	manifest = &Manifest{}
+
 	file, err := os.Open(manifestPath)
 	if err != nil {
 		return
@@ -27,7 +29,16 @@ func NewManifestFromPath(manifestPath string) (manifest *Manifest, err error) {
 	if err != nil {
 		return
 	}
-	err = goyaml.Unmarshal(yml, manifest)
+	err = goyaml.Unmarshal(yml, manifestData)
+
+	if manifestData["applications"] == nil {
+		copyAppSettingsToApplicationsArray(manifestData)
+	}
+
+	// cant do manifest = &Manifest(manifestData) for unknown reason
+	temp := Manifest(manifestData)
+	manifest = &temp
+
 	return
 }
 
@@ -76,4 +87,13 @@ func (manifest Manifest) Save(path string) (err error) {
 	}
 	ioutil.WriteFile(path, data, 0644)
 	return
+}
+
+func copyAppSettingsToApplicationsArray(manifestData map[string]interface{}) {
+	appData := make(map[interface{}]interface{})
+	for key := range manifestData {
+		appData[key] = manifestData[key]
+		delete(manifestData, key)
+	}
+	manifestData["applications"] = []interface{}{appData}
 }

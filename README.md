@@ -1,6 +1,8 @@
 cf-ssh
 ======
 
+**DEPRECATED:** Cloud Foundry CLI now has `cf ssh` built-in.
+
 SSH into a running container for your Cloud Foundry application, run one-off tasks, debug your app, and more.
 
 Initial implementation requires the application to have a `manifest.yml`.
